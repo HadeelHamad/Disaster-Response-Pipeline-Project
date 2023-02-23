@@ -5,6 +5,17 @@ import sys
 
 
 def load_data(messages_filepath, categories_filepath):
+    '''
+    Parameters
+    ----------
+    messages_filepath : path for csv messages file
+    categories_filepath : path for csv categories file
+
+    Returns
+    -------
+    df : merged dataframe of messages and categories datasets
+    '''
+  
     # load messages dataset
     messages = pd.read_csv(messages_filepath)
     # load categories dataset
@@ -17,6 +28,15 @@ def load_data(messages_filepath, categories_filepath):
 
 
 def clean_data(df):
+    '''
+
+    Parameters
+    ----------
+    df : merged dataframe
+    Returns
+    -------
+    df : cleaned dataframe, after converting 'categories' column to list of columns of categories values 
+    '''
     ##1.Split categories into separate category columns
     # create a dataframe of the 36 individual category columns
     categories = df.categories.str.split(";",expand=True)
@@ -44,6 +64,18 @@ def clean_data(df):
     return df
         
 def save_data(df, database_filename):
+    '''
+
+    Parameters
+    ----------
+    df : cleaned dataframe ready to be saved to sql database
+    database_filename : database file name 
+
+    Returns
+    -------
+    None.
+
+    '''
     #Save the clean dataset into an sqlite database
     engine = create_engine(database_filename)
     df.to_sql('messages_categories', engine, index=False)
