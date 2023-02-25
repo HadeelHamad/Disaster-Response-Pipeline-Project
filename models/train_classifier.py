@@ -40,7 +40,36 @@ def load_data(database_filepath):
 
 
 def tokenize(text):
-    pass
+    '''
+
+    Parameters
+    ----------
+    text : strint text to be tokenized
+    
+    Returns
+    -------
+    clean_tokens : list of tokens found in the input text
+
+    '''
+    url_regex = 'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+'
+    # get list of all urls using regex
+    detected_urls = re.findall(url_regex, text)
+    # replace each url in text string with placeholder
+    for url in detected_urls:
+        text = text.replace(url, "urlplaceholder")
+    # tokenize text
+    tokens = word_tokenize(text)
+    # initiate lemmatizer
+    lemmatizer = WordNetLemmatizer()
+
+    clean_tokens = []
+    # iterate through each token
+    for tok in tokens:
+        # lemmatize, normalize case, and remove leading/trailing white space
+        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tokens.append(clean_tok)
+
+    return clean_tokens
 
 
 def build_model():
