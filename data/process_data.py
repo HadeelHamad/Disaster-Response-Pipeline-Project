@@ -77,7 +77,7 @@ def save_data(df, database_filename):
 
     '''
     #Save the clean dataset into an sqlite database
-    engine = create_engine(database_filename)
+    engine = create_engine('sqlite:///%s')%database_filename
     df.to_sql('messages_categories', engine, index=False)
   
 

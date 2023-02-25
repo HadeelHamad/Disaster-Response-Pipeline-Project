@@ -4,10 +4,10 @@ from sqlalchemy import create_engine
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 import re
-from sklearn.pipeline import Pipeline, FeatureUnion
+from sklearn.pipeline import Pipeline
 from sklearn.multioutput import MultiOutputClassifier
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split,GridSearchCV
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 import nltk
 nltk.download(['punkt', 'wordnet', 'averaged_perceptron_tagger'])
@@ -31,8 +31,8 @@ def load_data(database_filepath):
 
     '''
     # load data from database
-    engine = create_engine(database_filepath)
-    df = pd.read_sql("SELECT * FROM messages_categories", engine)
+    engine = create_engine('sqlite:///%s')%database_filepath
+    df = pd.read_sql_table("messages_categories", engine)
     X = df.message
     Y = df.iloc[:,4:]
     category_names = Y.columns
@@ -73,7 +73,29 @@ def tokenize(text):
 
 
 def build_model():
-    pass
+    '''
+    
+    Returns
+    -------
+    cv : message categories classification pipeline including grid search with multiple parameters to try
+    '''
+    pipeline = Pipeline([
+        ('vect', CountVectorizer(tokenizer=tokenize)),
+        ('tfidf', TfidfTransformer()),
+        ('clf',MultiOutputClassifier(RandomForestClassifier()))
+    ])
+
+    gs_parameters = {
+        'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
+        'clf__criterion' :['gini', 'entropy'],
+        'clf__n_estimators': [50, 100, 200],
+        'clf__min_samples_split': [2, 3, 4],
+
+    }
+
+    cv = GridSearchCV(pipeline, param_grid=gs_parameters)
+
+    return cv
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
