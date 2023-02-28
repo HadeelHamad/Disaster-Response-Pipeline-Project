@@ -54,6 +54,10 @@ def clean_data(df):
         
         # convert column from string to numeric
         categories[column] = categories[column].astype(int)
+    # first I assumed that all coulmns values are 1 or 0, then I completed building the pipeline but an erreor occured when evaluating the
+    # model that there is a column category has 3 values (0,1,2) so I added the folowing line to remove 2 values
+    categories= categories.replace(2, 1)
+
     ##3.Replace categories column in df with new category columns
     # drop the original categories column from `df`
     df.drop(columns='categories',inplace=True)
