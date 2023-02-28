@@ -31,7 +31,7 @@ def load_data(database_filepath):
 
     '''
     # load data from database
-    engine = create_engine('sqlite:///%s')%database_filepath
+    engine = create_engine('sqlite:///%s'%database_filepath)
     df = pd.read_sql_table("messages_categories", engine)
     # define features and labels
     X = df.message
@@ -88,10 +88,10 @@ def build_model():
     ])
     # define parameters for GridSearchCV
     gs_parameters = {
-        'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
-        'classifier__criterion' :['gini', 'entropy'],
-        'classifier__n_estimators': [50, 100, 200],
-        'classifier__min_samples_split': [2, 3, 4],
+       'vect__ngram_range': ((1, 1), (1, 2)),
+       'classifier__estimator__criterion' :['gini', 'entropy'],
+       'classifier__estimator__n_estimators': [50, 100, 200],
+       'classifier__estimator__min_samples_split': [2, 3, 4],
 
     }
     # create gridsearch object and return as final model pipeline
