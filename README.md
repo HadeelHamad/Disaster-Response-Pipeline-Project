@@ -31,7 +31,7 @@ In a Python script, app/run.py, a web app will do the following:
 
 
 ### Instructions:
-1. Run the following commands in the project's root directory to set up your database and model.
+1. Run the following commands in the project's root directory to set up the database and model.
 
     - To run ETL pipeline that cleans data and stores in database
         `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
@@ -40,5 +40,5 @@ In a Python script, app/run.py, a web app will do the following:
 
 2. Go to `app` directory: `cd app`
 
-3. Run your web app: `python run.py`
+3. Run the web app: `python run.py`
 
