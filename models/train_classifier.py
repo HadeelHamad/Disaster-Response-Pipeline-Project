@@ -33,6 +33,7 @@ def load_data(database_filepath):
     # load data from database
     engine = create_engine('sqlite:///%s')%database_filepath
     df = pd.read_sql_table("messages_categories", engine)
+    # define features and labels
     X = df.message
     Y = df.iloc[:,4:]
     category_names = Y.columns
@@ -77,33 +78,63 @@ def build_model():
     
     Returns
     -------
-    cv : message categories classification pipeline including grid search with multiple parameters to try
+    model_pipeline : message categories classification pipeline including grid search with multiple parameters to try
     '''
+    # text processing and model pipeline
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
-        ('clf',MultiOutputClassifier(RandomForestClassifier()))
+        ('classifier',MultiOutputClassifier(RandomForestClassifier()))
     ])
-
+    # define parameters for GridSearchCV
     gs_parameters = {
         'features__text_pipeline__vect__ngram_range': ((1, 1), (1, 2)),
-        'clf__criterion' :['gini', 'entropy'],
-        'clf__n_estimators': [50, 100, 200],
-        'clf__min_samples_split': [2, 3, 4],
+        'classifier__criterion' :['gini', 'entropy'],
+        'classifier__n_estimators': [50, 100, 200],
+        'classifier__min_samples_split': [2, 3, 4],
 
     }
+    # create gridsearch object and return as final model pipeline
+    model_pipeline = GridSearchCV(pipeline, param_grid=gs_parameters)
 
-    cv = GridSearchCV(pipeline, param_grid=gs_parameters)
-
-    return cv
+    return model_pipeline
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
-    pass
+    '''
+
+    Parameters
+    ----------
+    model : ML model to be evaluated
+    X_test : input features to test the model
+    Y_test : ground truth labels for the test data
+    category_names : names of messages categories
+
+    Returns
+    -------
+    None.
+
+    '''
+    y_pred = model.predict(X_test)
+    print(classification_report(Y_test.values, y_pred, target_names=category_names.values))
+
 
 
 def save_model(model, model_filepath):
-    pass
+    '''
+
+    Parameters
+    ----------
+    model : ML model to be saved
+    model_filepath : required model file path to save in
+
+    Returns
+    -------
+    None.
+
+    '''
+    pickle.dump(model, open(model_filepath, "wb"))
+
 
 
 def main():
