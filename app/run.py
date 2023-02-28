@@ -45,6 +45,16 @@ def index():
     categories = df.iloc[:,4:].astype('int')
     top_cat_count = categories.sum().sort_values(ascending=False).head()
     category_names = list(top_cat_count.index)
+    frequent_tokens_dic={}
+    for m in df.message:
+        tokens = tokenize(m)
+        for t in tokens:
+            if t.isalpha()and len(t)>1:
+                if frequent_tokens_dic.get(t,-1)==-1: 
+                    frequent_tokens_dic[t]=1
+                else:
+                    frequent_tokens_dic[t]=frequent_tokens_dic[t]+1
+    sorted_dic_by_count = dict(sorted(frequent_tokens_dic.items(), key=lambda x:x[1], reverse=True))
 
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
@@ -66,8 +76,8 @@ def index():
                     'title': "Genre"
                 }
             }
-        },
-        
+        }
+        ,
         #2
          {
             'data': [
@@ -78,12 +88,33 @@ def index():
             ],
 
             'layout': {
-                'title': 'Distribution of Top Frequent Message Categories',
+                'title': 'Distribution of Top Frequent Words in Message Categories',
                 'yaxis': {
                     'title': "Count"
                 },
                 'xaxis': {
                     'title': "Category"
+                }
+            }
+        }
+        ,
+        #3
+       
+         {
+            'data': [
+                Bar(
+                    x=list(sorted_dic_by_count.keys())[0:50],
+                    y=list(sorted_dic_by_count.values())[0:50]
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Top Frequent Words in Messages',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Word"
                 }
             }
         }
@@ -95,7 +126,6 @@ def index():
     
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
-
 
 
 # web page that handles user query and displays model results
